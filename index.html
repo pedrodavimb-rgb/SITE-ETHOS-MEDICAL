@@ -265,7 +265,7 @@
 <header class="hero" id="top">
   <div class="hero-media" data-parallax>
     <div class="hero-fabric"></div>
-    <video class="hero-video" data-hv data-src="assets/hero-silk.mp4" muted loop playsinline preload="none" style="opacity:0"></video>
+    <video class="hero-video" data-hv data-src1080="assets/hero-silk-1080.mp4" data-src4k="assets/hero-silk-4k.mp4" muted loop playsinline preload="none" style="opacity:0"></video>
     <div class="hero-scrim"></div>
   </div>
   <div class="hero-inner" data-hero>
@@ -519,17 +519,18 @@
     });
   }
 
-  // --- hero video: carregamento adiado e condicional (não baixa em mobile/conexão lenta) ---
+  // --- hero video: adiado + responsivo (1080p no mobile, 4K no desktop; nada em Save-Data/2G) ---
   const vid = $('[data-hv]');
   if (vid && !reduce) {
     const conn = navigator.connection || {};
     const okData = conn.saveData !== true;
     const okSpeed = !/(^|-)2g$/.test(conn.effectiveType || '');
-    const bigScreen = window.matchMedia('(min-width:900px)').matches;
-    if (bigScreen && okData && okSpeed) {
+    if (okData && okSpeed) {
+      const big = window.matchMedia('(min-width:1200px)').matches;
+      const src = big ? vid.dataset.src4k : vid.dataset.src1080;
       const load = () => {
         if (vid.src) return;
-        vid.src = vid.dataset.src;
+        vid.src = src;
         const p = vid.play();
         if (p && p.catch) p.catch(() => {});
         requestAnimationFrame(() => { vid.style.opacity = '1'; });
