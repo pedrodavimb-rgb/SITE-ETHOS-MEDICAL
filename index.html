@@ -8,6 +8,10 @@
 <link rel="apple-touch-icon" href="assets/ethos-icon.png">
 <meta property="og:image" content="assets/ethos-icon.png">
 <meta name="twitter:image" content="assets/ethos-icon.png">
+<meta name="description" content="Ethos Medical — agência de marketing médico. Captação, tecnologia e reputação para clínicas e consultórios atraírem os pacientes certos e construírem uma agenda previsível.">
+<link rel="preload" href="assets/fonts/TTLakesNeue-Medium.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="assets/fonts/TTLakesNeue-Regular.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="assets/fonts/Mokoto.ttf" as="font" type="font/ttf" crossorigin>
 <style>
   @font-face{font-family:'TT Lakes Neue';src:url('assets/fonts/TTLakesNeue-Regular.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap}
   @font-face{font-family:'TT Lakes Neue';src:url('assets/fonts/TTLakesNeue-Italic.ttf') format('truetype');font-weight:400;font-style:italic;font-display:swap}
@@ -211,7 +215,7 @@
   .foot .brand{display:flex;align-items:center;gap:11px;font-weight:600;letter-spacing:.12em;color:var(--cream);font-size:16px}
   .foot .brand .mk{width:32px;height:28px;object-fit:contain}
   .foot-cols{display:flex;gap:56px;flex-wrap:wrap}
-  .foot-cols h4{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--goldl);margin-bottom:14px;font-weight:600}
+  .foot-cols h3{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--goldl);margin-bottom:14px;font-weight:600}
   .foot-cols a{display:block;font-size:14px;margin-bottom:9px;color:rgba(239,233,220,.7)}
   .foot-bot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:26px;font-size:12px;color:rgba(239,233,220,.45)}
 
@@ -261,8 +265,7 @@
 <header class="hero" id="top">
   <div class="hero-media" data-parallax>
     <div class="hero-fabric"></div>
-    <video class="hero-video" data-hv autoplay muted loop playsinline preload="auto" src="assets/hero-silk.mp4" style="opacity:1"></video>
-    <video class="hero-video" data-hv muted playsinline preload="auto" src="assets/hero-silk.mp4"></video>
+    <video class="hero-video" data-hv data-src="assets/hero-silk.mp4" muted loop playsinline preload="none" style="opacity:0"></video>
     <div class="hero-scrim"></div>
   </div>
   <div class="hero-inner" data-hero>
@@ -457,9 +460,9 @@
         <p style="font-size:14px;line-height:1.6;max-width:300px;margin-top:14px">Agência de marketing médico. Crescimento com sobriedade para clínicas e consultórios.</p>
       </div>
       <div class="foot-cols">
-        <div><h4>Serviços</h4><a href="#servicos">Tráfego Pago</a><a href="#servicos">Sites & LPs</a><a href="#servicos">Atendimento IA</a><a href="#servicos">SEO Médico</a></div>
-        <div><h4>Empresa</h4><a href="#metodo">Método</a><a href="#cases">Cases</a><a href="#faq">Dúvidas</a><a href="#contato">Contato</a></div>
-        <div><h4>Contato</h4><a href="#contato">contato@ethosmedical.com.br</a><a href="#contato">WhatsApp</a><a href="#contato">Instagram</a></div>
+        <div><h3>Serviços</h3><a href="#servicos">Tráfego Pago</a><a href="#servicos">Sites & LPs</a><a href="#servicos">Atendimento IA</a><a href="#servicos">SEO Médico</a></div>
+        <div><h3>Empresa</h3><a href="#metodo">Método</a><a href="#cases">Cases</a><a href="#faq">Dúvidas</a><a href="#contato">Contato</a></div>
+        <div><h3>Contato</h3><a href="#contato">contato@ethosmedical.com.br</a><a href="#contato">WhatsApp</a><a href="#contato">Instagram</a></div>
       </div>
     </div>
     <div class="foot-bot"><span>© 2026 Ethos Medical. Todos os direitos reservados.</span><span>Feito com sobriedade para a medicina.</span></div>
@@ -516,27 +519,23 @@
     });
   }
 
-  // --- seamless hero video crossfade ---
-  const vids = $$('[data-hv]');
-  if (vids.length >= 2) {
-    if (reduce) {
-      vids[0].loop = true; vids[0].style.opacity = '1';
-      vids.slice(1).forEach(v => v.style.opacity = '0');
-    } else {
-      let cur = 0; const FADE = 0.55;
-      vids.forEach((v, i) => { v.loop = false; v.style.opacity = i === 0 ? '1' : '0'; });
-      const start = (i) => { try { vids[i].currentTime = 0; const p = vids[i].play(); if (p && p.catch) p.catch(() => {}); } catch (e) {} };
-      start(0);
-      vids.forEach((v, i) => v.addEventListener('timeupdate', () => {
-        if (i !== cur || !v.duration) return;
-        if (v.duration - v.currentTime <= FADE) {
-          const n = (cur + 1) % vids.length;
-          vids[n].style.opacity = '1';
-          vids[cur].style.opacity = '0';
-          start(n);
-          cur = n;
-        }
-      }));
+  // --- hero video: carregamento adiado e condicional (não baixa em mobile/conexão lenta) ---
+  const vid = $('[data-hv]');
+  if (vid && !reduce) {
+    const conn = navigator.connection || {};
+    const okData = conn.saveData !== true;
+    const okSpeed = !/(^|-)2g$/.test(conn.effectiveType || '');
+    const bigScreen = window.matchMedia('(min-width:900px)').matches;
+    if (bigScreen && okData && okSpeed) {
+      const load = () => {
+        if (vid.src) return;
+        vid.src = vid.dataset.src;
+        const p = vid.play();
+        if (p && p.catch) p.catch(() => {});
+        requestAnimationFrame(() => { vid.style.opacity = '1'; });
+      };
+      if ('requestIdleCallback' in window) requestIdleCallback(load, { timeout: 2500 });
+      else setTimeout(load, 1200);
     }
   }
 
