@@ -265,7 +265,7 @@
 <header class="hero" id="top">
   <div class="hero-media" data-parallax>
     <div class="hero-fabric"></div>
-    <video class="hero-video" data-hv data-src1080="assets/hero-silk-1080.mp4" data-src4k="assets/hero-silk-4k.mp4" muted loop playsinline preload="none" style="opacity:0"></video>
+    <video class="hero-video" data-hv data-src1080="assets/hero-silk-1080.mp4" data-src4k="assets/hero-silk-4k.mp4" muted loop playsinline autoplay preload="auto" style="opacity:0"></video>
     <div class="hero-scrim"></div>
   </div>
   <div class="hero-inner" data-hero>
@@ -519,7 +519,7 @@
     });
   }
 
-  // --- hero video: carrega só na 1ª interação (fora do load; Lighthouse não dispara o decode) ---
+  // --- hero video: autoplay imediato ao abrir (sem imagem estática; gradiente cobre o carregamento) ---
   const vid = $('[data-hv]');
   if (vid && !reduce) {
     const conn = navigator.connection || {};
@@ -527,16 +527,10 @@
     const okSpeed = !/(^|-)2g$/.test(conn.effectiveType || '');
     if (okData && okSpeed) {
       const big = window.matchMedia('(min-width:1200px)').matches;
-      const evs = ['pointerdown', 'touchstart', 'wheel', 'keydown', 'scroll'];
-      const load = () => {
-        evs.forEach(ev => window.removeEventListener(ev, load));
-        if (vid.src) return;
-        vid.src = big ? vid.dataset.src4k : vid.dataset.src1080;
-        const p = vid.play();
-        if (p && p.catch) p.catch(() => {});
-        vid.addEventListener('canplay', () => requestAnimationFrame(() => { vid.style.opacity = '1'; }), { once: true });
-      };
-      evs.forEach(ev => window.addEventListener(ev, load, { passive: true }));
+      vid.src = big ? vid.dataset.src4k : vid.dataset.src1080;
+      const p = vid.play();
+      if (p && p.catch) p.catch(() => {});
+      vid.addEventListener('canplay', () => requestAnimationFrame(() => { vid.style.opacity = '1'; }), { once: true });
     }
   }
 
