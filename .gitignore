@@ -1,0 +1,16 @@
+# --- Material de origem (NÃO vai para o site publicado) ---
+site ethos/
+site ethos.zip
+
+# --- Config local do Claude Code (não deve ir para o servidor) ---
+.claude/
+
+# --- Arquivos de sistema ---
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# --- Temporários / logs ---
+*.log
+*.tmp
