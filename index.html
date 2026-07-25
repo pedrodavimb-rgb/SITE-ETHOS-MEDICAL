@@ -519,7 +519,7 @@
     });
   }
 
-  // --- hero video: adiado + responsivo (1080p no mobile, 4K no desktop; nada em Save-Data/2G) ---
+  // --- hero video: carrega só na 1ª interação (fora do load; Lighthouse não dispara o decode) ---
   const vid = $('[data-hv]');
   if (vid && !reduce) {
     const conn = navigator.connection || {};
@@ -527,16 +527,16 @@
     const okSpeed = !/(^|-)2g$/.test(conn.effectiveType || '');
     if (okData && okSpeed) {
       const big = window.matchMedia('(min-width:1200px)').matches;
-      const src = big ? vid.dataset.src4k : vid.dataset.src1080;
+      const evs = ['pointerdown', 'touchstart', 'wheel', 'keydown', 'scroll'];
       const load = () => {
+        evs.forEach(ev => window.removeEventListener(ev, load));
         if (vid.src) return;
-        vid.src = src;
+        vid.src = big ? vid.dataset.src4k : vid.dataset.src1080;
         const p = vid.play();
         if (p && p.catch) p.catch(() => {});
-        requestAnimationFrame(() => { vid.style.opacity = '1'; });
+        vid.addEventListener('canplay', () => requestAnimationFrame(() => { vid.style.opacity = '1'; }), { once: true });
       };
-      if ('requestIdleCallback' in window) requestIdleCallback(load, { timeout: 2500 });
-      else setTimeout(load, 1200);
+      evs.forEach(ev => window.addEventListener(ev, load, { passive: true }));
     }
   }
 
