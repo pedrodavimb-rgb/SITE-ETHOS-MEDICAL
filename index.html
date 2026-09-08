@@ -196,6 +196,15 @@
   .form input,.form select{width:100%;background:var(--green2);border:1px solid var(--lineD);border-radius:10px;padding:14px 16px;color:var(--cream);font-family:inherit;font-size:14px;outline:none;transition:border-color .3s var(--ease)}
   .form input:focus,.form select:focus{border-color:var(--gold)}
   .form input::placeholder{color:rgba(239,233,220,.4)}
+  .lead-fields{display:flex;flex-direction:column;gap:12px}
+  .lead-err{display:none;font-size:12px;color:#e8a297;text-align:center;margin-top:-4px}
+  .form.has-error .lead-err{display:block}
+  .lead-success{display:none;text-align:center;padding:6px 4px 2px}
+  .lead-success h3{font-size:18px;font-weight:600;color:var(--cream)}
+  .lead-success p{font-size:14px;line-height:1.6;color:rgba(239,233,220,.7);margin-top:8px}
+  .lead-success .btn{margin-top:20px}
+  .form.is-sent .lead-fields{display:none}
+  .form.is-sent .lead-success{display:block}
 
   /* ---- footer ---- */
   .foot{background:var(--green2);color:rgba(239,233,220,.7);padding:56px var(--px) 40px}
@@ -216,6 +225,7 @@
   /* ---- responsive ---- */
   @media(max-width:980px){
     .proof-grid{grid-template-columns:1fr}
+    .proof-grid .btn{display:flex;width:fit-content;margin-left:auto;margin-right:auto}
     .ben-grid{grid-template-columns:repeat(2,1fr)}
     .step-grid{grid-template-columns:repeat(2,1fr)}
     .offer-box,.final-grid{grid-template-columns:1fr}
@@ -252,7 +262,7 @@
 <header class="hero" id="top">
   <div class="hero-media" data-parallax>
     <div class="hero-fabric"></div>
-    <video class="hero-video" data-hv data-src1080="assets/hero-silk-1080.mp4" data-src4k="assets/hero-silk-4k.mp4" muted loop playsinline autoplay preload="auto" style="opacity:0"></video>
+    <video class="hero-video" data-hv data-src1080="assets/hero-silk-1080.mp4" data-src4k="assets/hero-silk-4k.mp4" muted loop playsinline webkit-playsinline="true" autoplay preload="auto" style="opacity:0"></video>
     <div class="hero-scrim"></div>
   </div>
   <div class="hero-inner" data-hero>
@@ -344,9 +354,7 @@
       <div class="card rv"><div class="ic">◈</div><h3>CRM & Gestão de Clientes</h3><p>Cada contato organizado do primeiro clique à fidelização, com follow-up que não deixa paciente esfriar.</p></div>
       <div class="card rv" style="transition-delay:.06s"><div class="ic">⌕</div><h3>SEO Médico</h3><p>Sua clínica no topo do Google exatamente quando o paciente procura pela sua especialidade.</p></div>
       <div class="card rv" style="transition-delay:.12s"><div class="ic">★</div><h3>Reputação Online</h3><p>Gestão de avaliações e imagem para uma marca médica que inspira confiança à primeira vista.</p></div>
-      <div class="card rv"><div class="ic">▷</div><h3>Vídeos com IA</h3><p>Conteúdo em escala com o rosto e a voz da sua marca, sem depender de gravações intermináveis.</p></div>
-      <div class="card rv" style="transition-delay:.06s"><div class="ic">❖</div><h3>Redes Sociais & Branding</h3><p>Identidade e presença social consistentes, do posicionamento à publicação do dia a dia.</p></div>
-      <div class="card rv" style="transition-delay:.12s"><div class="ic">☎&#xFE0E;</div><h3>Treinamento de Secretária</h3><p>Seu time comercial preparado para converter cada ligação e cada mensagem em agendamento.</p></div>
+      <div class="card rv"><div class="ic">☎&#xFE0E;</div><h3>Treinamento de Secretária</h3><p>Seu time comercial preparado para converter cada ligação e cada mensagem em agendamento.</p></div>
     </div>
   </div>
 </section>
@@ -412,13 +420,21 @@
       <h2 class="rv" style="margin-top:14px">Sua próxima temporada de agenda cheia começa com uma conversa.</h2>
       <p class="rv" style="transition-delay:.1s">Preencha os dados e nossa equipe entra em contato em até 1 dia útil para agendar seu diagnóstico gratuito.</p>
     </div>
-    <form class="form rv" style="transition-delay:.15s" onsubmit="return false">
-      <div><label>Seu nome</label><input type="text" placeholder="Dr(a). Nome Sobrenome" /></div>
-      <div><label>WhatsApp</label><input type="tel" placeholder="(00) 00000-0000" /></div>
-      <div><label>Especialidade</label><input type="text" placeholder="Ex.: Dermatologia" /></div>
-      <div><label>Cidade / Estado</label><input type="text" placeholder="Ex.: São Paulo, SP" /></div>
-      <button class="btn btn-g" type="submit" style="justify-content:center;margin-top:6px">Agendar diagnóstico gratuito →</button>
-      <p style="font-size:11px;color:rgba(239,233,220,.45);text-align:center">Seus dados estão seguros. Sem spam, sem compromisso.</p>
+    <form class="form rv" data-lead-form style="transition-delay:.15s">
+      <div class="lead-fields">
+        <div><label>Seu nome</label><input type="text" name="nome" placeholder="Dr(a). Nome Sobrenome" required /></div>
+        <div><label>WhatsApp</label><input type="tel" name="whatsapp" placeholder="(00) 00000-0000" required /></div>
+        <div><label>Especialidade</label><input type="text" name="especialidade" placeholder="Ex.: Dermatologia" required /></div>
+        <div><label>Cidade / Estado</label><input type="text" name="cidade" placeholder="Ex.: São Paulo, SP" required /></div>
+        <button class="btn btn-g" type="submit" data-lead-submit style="justify-content:center;margin-top:6px">Agendar diagnóstico gratuito →</button>
+        <p class="lead-err" data-lead-err>Não foi possível enviar. Verifique os dados e tente novamente.</p>
+        <p style="font-size:11px;color:rgba(239,233,220,.45);text-align:center">Seus dados estão seguros. Sem spam, sem compromisso.</p>
+      </div>
+      <div class="lead-success">
+        <h3>Recebemos seus dados!</h3>
+        <p>Fale agora com a gente pelo WhatsApp pra adiantar seu diagnóstico gratuito.</p>
+        <a class="btn btn-g" data-lead-whatsapp target="_blank" rel="noopener">Continuar no WhatsApp →</a>
+      </div>
     </form>
   </div>
 </section>
@@ -428,7 +444,7 @@
   <div class="wrap">
     <div class="foot-top">
       <div>
-        <div class="brand"><span class="mk-badge"><picture><source srcset="assets/ethos-badge.webp" type="image/webp"><img src="assets/ethos-badge.png" width="40" height="40" alt="Ethos Medical" decoding="async" loading="lazy"></picture></span>ETHOS MEDICAL</div>
+        <div class="brand"><span class="mk-badge"><picture><source srcset="assets/ethos-badge.webp" type="image/webp"><img src="assets/ethos-badge.png" width="40" height="40" alt="Ethos Medical" decoding="async"></picture></span>ETHOS MEDICAL</div>
         <p style="font-size:14px;line-height:1.6;max-width:300px;margin-top:14px">Agência de marketing médico. Crescimento com sobriedade para clínicas e consultórios.</p>
       </div>
       <div class="foot-cols">
@@ -443,6 +459,7 @@
 
 <div class="mcta" data-mcta><a class="btn btn-g" href="#contato">Agendar diagnóstico gratuito →</a></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
 (function(){
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -499,10 +516,32 @@
     const okSpeed = !/(^|-)2g$/.test(conn.effectiveType || '');
     if (okData && okSpeed) {
       const big = window.matchMedia('(min-width:1200px)').matches;
+      // alguns navegadores/webviews mobile só respeitam autoplay se "muted"
+      // for setado via JS (o atributo HTML sozinho às vezes não basta)
+      vid.muted = true;
+      vid.defaultMuted = true;
       vid.src = big ? vid.dataset.src4k : vid.dataset.src1080;
-      const p = vid.play();
-      if (p && p.catch) p.catch(() => {});
+      vid.load();
       vid.addEventListener('canplay', () => requestAnimationFrame(() => { vid.style.opacity = '1'; }), { once: true });
+
+      const tryPlay = () => {
+        const p = vid.play();
+        if (p && p.catch) p.catch(() => {});
+      };
+      tryPlay();
+      // reforça a tentativa quando os dados do vídeo ficam prontos
+      // (o play() imediato pode falhar em conexões mobile mais lentas)
+      vid.addEventListener('loadedmetadata', tryPlay);
+      vid.addEventListener('canplay', tryPlay);
+
+      // rede de segurança: se o autoplay foi bloqueado, o primeiro toque
+      // do usuário (em qualquer lugar da página, ou no próprio vídeo)
+      // retoma a reprodução — evita o vídeo "travado" com play que não reage
+      const resumeOnGesture = () => { if (vid.paused) tryPlay(); };
+      ['touchstart', 'pointerdown', 'scroll'].forEach(evt =>
+        document.addEventListener(evt, resumeOnGesture, { once: true, passive: true })
+      );
+      vid.addEventListener('click', resumeOnGesture);
     }
   }
 
@@ -541,6 +580,46 @@
     requestAnimationFrame(() => {
       const f1 = faq.querySelector('.faq-item');
       if (f1) { f1.classList.add('open'); const a1 = f1.querySelector('.faq-a'); a1.style.maxHeight = a1.scrollHeight + 'px'; }
+    });
+  }
+
+  // --- lead form: salva no Supabase e libera contato via WhatsApp ---
+  const leadForm = $('[data-lead-form]');
+  if (leadForm && window.supabase) {
+    const SUPABASE_URL = 'https://yaulwneptzarnrzufsow.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhdWx3bmVwdHphcm5yenVmc293Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4Nzk1MDgsImV4cCI6MjEwNDQ1NTUwOH0.KXJdz62hNDJR-aMucFguiKPzqnZznYsZZaFnfjCSQV4';
+    const WHATSAPP_NUMBER = '5511925040701';
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const submitBtn = leadForm.querySelector('[data-lead-submit]');
+    const waLink = leadForm.querySelector('[data-lead-whatsapp]');
+
+    leadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      leadForm.classList.remove('has-error');
+
+      const nome = leadForm.nome.value.trim();
+      const whatsapp = leadForm.whatsapp.value.trim();
+      const especialidade = leadForm.especialidade.value.trim();
+      const cidade = leadForm.cidade.value.trim();
+      if (!nome || !whatsapp || !especialidade || !cidade) return;
+
+      const originalLabel = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Enviando...';
+
+      const { error } = await sb.from('leads').insert({ nome, whatsapp, especialidade, cidade });
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalLabel;
+
+      if (error) {
+        leadForm.classList.add('has-error');
+        return;
+      }
+
+      const msg = `Olá! Sou ${nome}, ${especialidade}, de ${cidade}. Preenchi o formulário no site e gostaria de agendar meu diagnóstico gratuito.`;
+      waLink.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+      leadForm.classList.add('is-sent');
     });
   }
 })();
