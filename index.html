@@ -193,18 +193,18 @@
   .final p{font-size:16px;line-height:1.6;color:rgba(239,233,220,.75);margin-top:18px;max-width:440px}
   .form{background:rgba(239,233,220,.05);border:1px solid var(--lineD);border-radius:18px;padding:28px;display:flex;flex-direction:column;gap:12px}
   .form label{font-size:12px;letter-spacing:.05em;color:rgba(239,233,220,.6)}
-  .form input,.form select{width:100%;background:var(--green2);border:1px solid var(--lineD);border-radius:10px;padding:14px 16px;color:var(--cream);font-family:inherit;font-size:14px;outline:none;transition:border-color .3s var(--ease)}
+  .form input,.form select{width:100%;background:var(--green2);border:1px solid var(--lineD);border-radius:10px;padding:14px 16px;color:var(--cream);font-family:inherit;font-size:16px;outline:none;transition:border-color .3s var(--ease)}
   .form input:focus,.form select:focus{border-color:var(--gold)}
   .form input::placeholder{color:rgba(239,233,220,.4)}
-  .lead-fields{display:flex;flex-direction:column;gap:12px}
+  .lead-fields{display:flex;flex-direction:column;gap:12px;overflow:hidden;max-height:600px;opacity:1;transition:max-height .5s var(--ease),opacity .3s var(--ease)}
   .lead-err{display:none;font-size:12px;color:#e8a297;text-align:center;margin-top:-4px}
   .form.has-error .lead-err{display:block}
-  .lead-success{display:none;text-align:center;padding:6px 4px 2px}
+  .lead-success{max-height:0;overflow:hidden;opacity:0;text-align:center;padding:6px 4px 2px;transition:max-height .5s var(--ease) .12s,opacity .4s var(--ease) .12s}
   .lead-success h3{font-size:18px;font-weight:600;color:var(--cream)}
   .lead-success p{font-size:14px;line-height:1.6;color:rgba(239,233,220,.7);margin-top:8px}
   .lead-success .btn{margin-top:20px}
-  .form.is-sent .lead-fields{display:none}
-  .form.is-sent .lead-success{display:block}
+  .form.is-sent .lead-fields{max-height:0;opacity:0;pointer-events:none}
+  .form.is-sent .lead-success{max-height:420px;opacity:1}
 
   /* ---- footer ---- */
   .foot{background:var(--green2);color:rgba(239,233,220,.7);padding:56px var(--px) 40px}
@@ -619,6 +619,12 @@
 
       const msg = `Olá! Sou ${nome}, ${especialidade}, de ${cidade}. Preenchi o formulário no site e gostaria de agendar meu diagnóstico gratuito.`;
       waLink.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+      // tira o foco do campo antes de trocar de tela: em iOS, se o input
+      // focado some da tela enquanto o zoom automático de foco ainda está
+      // ativo, o zoom fica "preso" e a página parece quebrada
+      if (document.activeElement && leadForm.contains(document.activeElement)) {
+        document.activeElement.blur();
+      }
       leadForm.classList.add('is-sent');
     });
   }
