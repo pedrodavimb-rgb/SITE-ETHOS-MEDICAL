@@ -75,9 +75,10 @@
     .nav .brand .mk-badge{width:32px;height:32px}
     .navcta{padding:8px 14px;font-size:11px}
   }
+  @media(max-width:500px){.cta-compact{font-size:12.5px;padding:14px 18px}}
 
   /* ---- buttons ---- */
-  .btn{display:inline-flex;align-items:center;gap:8px;padding:15px 30px;border-radius:44px;font-size:14px;font-weight:600;cursor:pointer;
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:15px 30px;border-radius:44px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;
     transition:transform .35s var(--ease),box-shadow .35s var(--ease),background .35s var(--ease),color .35s var(--ease);border:1px solid transparent}
   .btn-p{background:var(--ink);color:var(--cream)}
   .btn-p:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 14px 30px -12px rgba(22,40,29,.6);color:var(--cream)}
@@ -317,7 +318,7 @@
           <div class="kpi rv" style="transition-delay:.1s"><span class="n count" data-target="3.2" data-dec="1" data-pre="R$" data-suf="M">R$0M</span><span class="l">em receita adicional gerada para clínicas parceiras.</span></div>
           <div class="kpi rv" style="transition-delay:.2s"><span class="n count" data-target="38" data-pre="-" data-suf="%">-0%</span><span class="l">de redução no custo de aquisição por paciente.</span></div>
         </div>
-        <a class="btn btn-o rv" href="#contato" style="margin-top:26px;transition-delay:.3s">Quero esses números na minha clínica →</a>
+        <a class="btn btn-o rv cta-compact" href="#contato" style="margin-top:26px;transition-delay:.3s">Quero esses números na minha clínica →</a>
       </div>
     </div>
   </div>
@@ -389,7 +390,7 @@
       </div>
       <div class="offer-cta">
         <div class="price">Diagnóstico Inicial</div>
-        <div class="free">Gratuita</div>
+        <div class="free">Gratuito</div>
         <a class="btn btn-g" href="#contato" style="width:100%;justify-content:center">Quero meu diagnóstico</a>
         <p style="font-size:12px;color:rgba(239,233,220,.5);margin-top:14px">Vagas limitadas por mês para garantir a qualidade do atendimento.</p>
       </div>
@@ -465,6 +466,22 @@
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const $ = (s, r) => (r || document).querySelector(s);
   const $$ = (s, r) => [...(r || document).querySelectorAll(s)];
+
+  // --- ancoras internas (#contato, #resultados, etc.) ---
+  // o scroll assumido via JS evita o bug do Safari/iOS em que o scroll
+  // suave nativo (scroll-behavior:smooth) fica curto por causa da barra
+  // de endereço recolhendo durante a animação, exigindo um segundo toque
+  // pra completar o salto até a seção
+  $$('a[href^="#"]').forEach((a) => {
+    const id = a.getAttribute('href').slice(1);
+    const target = id && document.getElementById(id);
+    if (!target) return;
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      history.pushState(null, '', '#' + id);
+    });
+  });
 
   // --- reveals ---
   const revs = $$('.rv');
@@ -549,19 +566,25 @@
   const nav = $('[data-nav]');
   const par = $('[data-parallax]');
   const mcta = $('[data-mcta]');
-  let lastY = window.scrollY, ticking = false;
+  const footer = $('.foot');
+  let pastHero = false;
+  let overFooter = false;
+  const updateMcta = () => { if (mcta) mcta.classList.toggle('show', pastHero && !overFooter); };
+  if (footer && 'IntersectionObserver' in window) {
+    new IntersectionObserver((ents) => {
+      overFooter = ents[0].isIntersecting;
+      updateMcta();
+    }).observe(footer);
+  }
   const onScroll = () => {
     const y = window.scrollY;
     if (nav) nav.classList.toggle('solid', y > 40);
     if (par && !reduce && y < window.innerHeight * 1.2) par.style.transform = `translate3d(0,${y * 0.28}px,0)`;
-    if (mcta) {
-      const past = y > window.innerHeight * 0.9;
-      const goingDown = y > lastY;
-      mcta.classList.toggle('show', past && goingDown);
-    }
-    lastY = y;
+    pastHero = y > window.innerHeight * 0.9;
+    updateMcta();
     ticking = false;
   };
+  let ticking = false;
   const onScrollThrottled = () => { if (!ticking) { requestAnimationFrame(onScroll); ticking = true; } };
   window.addEventListener('scroll', onScrollThrottled, { passive: true });
   onScroll();
@@ -622,10 +645,18 @@
       // tira o foco do campo antes de trocar de tela: em iOS, se o input
       // focado some da tela enquanto o zoom automático de foco ainda está
       // ativo, o zoom fica "preso" e a página parece quebrada
+      const lockedY = window.scrollY;
       if (document.activeElement && leadForm.contains(document.activeElement)) {
         document.activeElement.blur();
       }
       leadForm.classList.add('is-sent');
+      // no iOS, o teclado fechando ao mesmo tempo que o card encolhe pode
+      // empurrar a página pra baixo sozinho (chegando até o rodapé) — trava
+      // a posição de scroll pra tela só "atualizar" no lugar, sem pular
+      const relock = () => window.scrollTo(0, lockedY);
+      requestAnimationFrame(relock);
+      setTimeout(relock, 120);
+      setTimeout(relock, 400);
     });
   }
 })();
